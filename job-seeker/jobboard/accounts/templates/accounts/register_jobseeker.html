@@ -1,17 +1,18 @@
-{% extends "base.html" %}
-{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Job Seeker Registration</title>
+</head>
+<body>
+<h2>Register as Job Seeker</h2>
 
-{% block content %}
-<div class="container mt-5" style="max-width: 500px;">
-    <h2 class="mb-4 text-center">Job Seeker Registration</h2>
-    <form method="post" enctype="multipart/form-data" class="card p-4 shadow">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-success w-100">Register as Job Seeker</button>
-    </form>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Register</button>
+</form>
 
-    <div class="text-center mt-3">
-        <a href="{% url 'login' %}">Already have an account? Login here</a>
-    </div>
-</div>
-{% endblock %}
+<a href="{% url 'login' %}">Already have an account? Login</a>
+
+</body>
+</html>

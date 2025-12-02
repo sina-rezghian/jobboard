@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}My Resumes{% endblock %}
+
+{% block content %}
+<h2>My Resumes</h2>
+
+{% if resumes %}
+    <ul>
+    {% for r in resumes %}
+        <li>
+            {{ r.title|default:"Resume" }} - uploaded at {{ r.created_at|date:"Y-m-d H:i" }}
+            - <a href="{{ r.file.url }}" target="_blank" download>Download</a>
+            {% if r.education %} - Education: {{ r.education }}{% endif %}
+            {% if r.skills %} - Skills: {{ r.skills|truncatechars:80 }}{% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>You have no resumes yet. <a href="{% url 'upload_resume' %}">Upload one now</a>.</p>
+{% endif %}
+
+{% endblock %}

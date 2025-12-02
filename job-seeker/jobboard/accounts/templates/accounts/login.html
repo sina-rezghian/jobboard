@@ -1,19 +1,20 @@
-{% extends "base.html" %}
-{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
 
-{% block content %}
-<div class="container mt-5" style="max-width: 400px;">
-    <h2 class="mb-4 text-center">Login</h2>
-    <form method="post" class="card p-4 shadow">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary w-100">Login</button>
-    </form>
+<h2>Login</h2>
 
-    <div class="text-center mt-3">
-        <p>Don’t have an account?</p>
-        <a href="{% url 'register_employer' %}" class="me-2">Register as Employer</a> |
-        <a href="{% url 'register_jobseeker' %}" class="ms-2">Register as Job Seeker</a>
-    </div>
-</div>
-{% endblock %}
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Login</button>
+</form>
+
+<a href="{% url 'register_employer' %}">Register as Employer</a><br>
+<a href="{% url 'register_jobseeker' %}">Register as Job Seeker</a>
+
+</body>
+</html>
