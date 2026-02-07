@@ -1,0 +1,2 @@
+{% extends "base.html" %}
+{% block content %}<h1 class="h4">Recommended Jobs</h1>{% for r in recommendations %}<div><a href="{% url 'job_detail' r.job.id %}">{{ r.job.title }}</a> (score: {{ r.score }})</div>{% empty %}<p>No recommendations yet.</p>{% endfor %}{% endblock %}

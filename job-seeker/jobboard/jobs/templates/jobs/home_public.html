@@ -1,0 +1,2 @@
+{% extends "base.html" %}
+{% block content %}<div class="p-4 bg-light rounded-3"><h1 class="h3">JobBoard like Indeed</h1><p>{{ stats.jobs }} jobs • {{ stats.companies }} companies</p><a class="btn btn-primary" href="{% url 'job_list' %}">Browse jobs</a></div>{% endblock %}

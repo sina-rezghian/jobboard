@@ -1,0 +1,2 @@
+{% extends "base.html" %}
+{% block content %}<h1 class="h4">Applications for {{ job.title }}</h1>{% for a in applications %}<div><a href="{% url 'application_detail' a.id %}">{{ a.jobseeker.user.username }}</a> - {{ a.get_status_display }}</div>{% empty %}<p>No applications.</p>{% endfor %}{% endblock %}

@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="text-center py-5"><h1 class="h3 mb-3">Choose account type</h1>
+<a class="btn btn-primary me-2" href="{% url 'register_jobseeker' %}">Job seeker</a>
+<a class="btn btn-outline-primary" href="{% url 'register_employer' %}">Employer</a></div>
+{% endblock %}

@@ -1,0 +1,2 @@
+{% extends "base.html" %}
+{% block content %}<h1 class="h4">My Jobs</h1>{% for job in jobs %}<div><a href="{% url 'edit_job' job.id %}">{{ job.title }}</a> · <a href="{% url 'view_applications' job.id %}">Applications</a></div>{% empty %}<p>No jobs yet.</p>{% endfor %}{% endblock %}

@@ -1,0 +1,2 @@
+{% extends "base.html" %}
+{% block content %}<h1 class="h4">Job Alerts</h1><form method="post" class="mb-3">{% csrf_token %}{{ form.as_p }}<button class="btn btn-primary">Save alert</button></form>{% for a in alerts %}<div>{{ a.keywords }} <a href="{% url 'delete_job_alert' a.id %}">Delete</a></div>{% empty %}<p>No alerts.</p>{% endfor %}{% endblock %}

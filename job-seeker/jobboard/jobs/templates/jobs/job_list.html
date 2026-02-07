@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="h4 mb-3">Find jobs</h1>
+<form class="row g-2 mb-3" method="get">
+<div class="col-md"><input class="form-control" name="q" value="{{ q }}" placeholder="Keyword"></div>
+<div class="col-md"><input class="form-control" name="skills" value="{{ skills }}" placeholder="Skills"></div>
+<div class="col-md"><input class="form-control" name="city" value="{{ city }}" placeholder="City"></div>
+<div class="col"><button class="btn btn-primary">Search</button></div></form>
+{% for job in jobs %}<div class="card p-3 mb-2"><a href="{% url 'job_detail' job.id %}" class="h6 mb-1">{{ job.title }}</a><div>{{ job.location }}</div></div>{% empty %}<p>No jobs found.</p>{% endfor %}
+{% endblock %}

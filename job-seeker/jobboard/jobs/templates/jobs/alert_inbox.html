@@ -1,0 +1,2 @@
+{% extends "base.html" %}
+{% block content %}<h1 class="h4">Alert Inbox</h1>{% for m in matches %}<div><a href="{% url 'job_detail' m.job.id %}">{{ m.job.title }}</a></div>{% empty %}<p>No matches.</p>{% endfor %}{% endblock %}

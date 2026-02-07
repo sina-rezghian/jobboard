@@ -1,0 +1,2 @@
+{% extends "base.html" %}
+{% block content %}<h1 class="h4">SMS Log</h1>{% for e in entries %}<pre class="small border p-2">{{ e|safe }}</pre>{% empty %}<p>No messages yet.</p>{% endfor %}{% endblock %}

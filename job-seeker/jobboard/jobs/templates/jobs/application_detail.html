@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="h4">Application #{{ application.id }}</h1>
+<p><strong>{{ application.job.title }}</strong> - {{ application.jobseeker.user.username }}</p>
+<p>Status: {{ application.get_status_display }}</p>
+{% if can_manage %}
+<a class="btn btn-sm btn-outline-primary" href="{% url 'schedule_interview' application.id %}">Schedule interview</a>
+<a class="btn btn-sm btn-outline-danger" href="{% url 'reject_application' application.id %}">Reject</a>
+<form method="post" class="mt-3">{% csrf_token %}<textarea class="form-control mb-2" name="note_content" placeholder="Internal note"></textarea><button class="btn btn-secondary btn-sm">Save note</button></form>
+{% endif %}
+{% endblock %}

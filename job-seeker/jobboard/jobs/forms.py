@@ -1,6 +1,6 @@
 from django import forms
 
-from .constants import UK_CITIES
+from .constants import ENGLAND_CITIES, UK_CITIES
 from .models import Job, JobApplication
 
 

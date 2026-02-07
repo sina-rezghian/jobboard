@@ -1,0 +1,2 @@
+{% extends "base.html" %}
+{% block content %}<h1 class="h4">Saved jobs</h1>{% for s in saved_jobs %}<div><a href="{% url 'job_detail' s.job.id %}">{{ s.job.title }}</a></div>{% empty %}<p>No saved jobs.</p>{% endfor %}{% endblock %}

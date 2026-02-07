@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-6"><div class="card p-4">
+<h1 class="h5">SMS Activation</h1>
+<form method="post">{% csrf_token %}
+<input class="form-control mb-2" name="username" placeholder="Username">
+<input class="form-control mb-3" name="code" placeholder="6-digit code">
+<button class="btn btn-primary" type="submit">Activate</button>
+</form></div></div></div>
+{% endblock %}

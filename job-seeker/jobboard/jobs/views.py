@@ -16,7 +16,7 @@ from resumes.models import Resume
 from accounts.decorators import employer_required, jobseeker_required
 from .constants import ENGLAND_CITIES
 from .forms import JobForm, JobApplicationForm, JobAlertForm
-from .models import Job, JobApplication
+from .models import Job, JobApplication, ApplicationNote
 from .utils import send_application_status_notification, process_job_alerts_for_job, record_application_event, create_in_app_notification
 
 logger = logging.getLogger(__name__)
@@ -204,7 +204,6 @@ def apply_job(request, job_id):
             )
 
             # Demo email/SMS notifications (logged to files under logs/)
-            notify_failed = False
             notify_failed = False
             try:
                 from jobboard.email_demo import send_email_demo
