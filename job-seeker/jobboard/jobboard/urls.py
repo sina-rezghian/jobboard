@@ -2,11 +2,12 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from accounts import views as accounts_views  # if you use home view there
+from accounts import views as accounts_views
+from jobs import views as job_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', accounts_views.home, name='home'),   # home page
+    path('', job_views.home_public, name='home'),   # landing page
     path('accounts/', include('accounts.urls')),
     path('jobs/', include('jobs.urls')),
     path('resumes/', include('resumes.urls')),

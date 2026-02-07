@@ -1,0 +1,62 @@
+گزارش تکمیلی (فاز 3 و 4 + بخش‌های امتیازی انتخابی)
+
+مشخصات:
+- پروژه: JobBoard (Django + PostgreSQL)
+- نام دانشجو: سینا رزقیان
+- شماره دانشجویی: 4011833215
+- درس: برنامه نویسی وب
+- استاد: ندا سلطانی
+
+توضیح این نسخه (اختیاری/امتیازی):
+1) Pagination (صفحه‌بندی) برای:
+   - لیست آگهی‌ها
+   - آگهی‌های کارفرما
+   - اپلیکیشن‌های کارجو
+   - اپلیکیشن‌های کارفرما
+2) Application Timeline (Timeline) برای هر اپلیکیشن:
+   - رویداد Submitted / Interview / Rejected ذخیره می‌شود و در صفحه جزئیات اپلیکیشن نمایش داده می‌شود.
+4) Role-Based Access Control:
+   - مسیرهای مربوط به کارفرما/کارجو با decorator کنترل می‌شوند.
+5) Validation بهتر:
+   - اعتبارسنجی min/max salary
+   - جلوگیری از ارسال اپلیکیشن تکراری برای یک job
+   - محدودیت نوع فایل رزومه (pdf/doc/docx)
+6) Saved Jobs:
+   - کارجو می‌تواند Job را Save/Unsave کند و لیست Saved Jobs را ببیند.
+7) Job Alerts (بدون ایمیل واقعی):
+   - کارجو Alert تعریف می‌کند.
+   - وقتی کارفرما Job جدید ثبت کند، اگر با Alertها match شود در Alert Inbox نمایش داده می‌شود.
+8) Recommended Jobs:
+   - توصیه‌گر ساده بر اساس همپوشانی مهارت‌ها و کلمات کلیدی تحصیلات (مثل قبل، با UI بهتر)
+9) Dashboard:
+   - داشبورد کارفرما: آمار Jobها و اپلیکیشن‌ها + آخرین اپلیکیشن‌ها
+   - داشبورد کارجو: آمار اپلیکیشن‌ها + Saved Jobs + Alert Inbox
+
+نکته درباره گزینه 3 (ارسال ایمیل واقعی):
+- این نسخه عمداً ارسال ایمیل واقعی را الزامی نکرده است (می‌تواند با SMTP/Gmail یا سرویس‌های رایگان/تست انجام شود).
+- برای تست/دمو، در نسخه‌های قبلی از console email backend هم می‌شود استفاده کرد.
+
+راه‌اندازی (Windows CMD):
+1) ساخت venv و نصب:
+   cd /d E:\Dj-pro\jobboard-main\job-seeker\jobboard
+   python -m venv .venv
+   .venv\Scripts\activate
+   pip install -r requirements.txt
+
+2) تنظیم دیتابیس:
+   - در jobboard/settings.py مقادیر DATABASES را مطابق PostgreSQL خودتان ست کنید.
+   - سپس:
+     python manage.py migrate
+
+3) ساخت سوپر یوزر:
+   python manage.py createsuperuser
+
+4) ساخت دیتای دمو (کارفرماها + jobها + یک کارجو):
+   python manage.py seed_demo_data --reset
+
+   خروجی دستور، یوزرنیم/پسوردها را چاپ می‌کند.
+   پسورد پیش‌فرض: Pass12345!
+
+5) اجرا:
+   python manage.py runserver
+

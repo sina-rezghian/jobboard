@@ -1,17 +1,38 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Home</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Home • JobBoard{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card p-4">
+      <h1 class="h3 mb-2">Find the right job — faster</h1>
+      <p class="text-muted mb-3">Browse jobs, apply in seconds, and manage your resumes all in one place.</p>
 
-<h2>Welcome {{ request.user.username }}</h2>
+      <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-primary" href="{% url 'job_list' %}">Browse Jobs</a>
 
-{% if request.user.is_authenticated %}
-    <a href="{% url 'logout' %}">Logout</a>
-{% else %}
-    <a href="{% url 'login' %}">Login</a>
-{% endif %}
+        {% if user.is_authenticated and user.role == 'jobseeker' %}
+          <a class="btn btn-outline-secondary" href="{% url 'resume_list' %}">My Resumes</a>
+          <a class="btn btn-outline-secondary" href="{% url 'upload_resume' %}">Upload Resume</a>
+        {% elif user.is_authenticated and user.role == 'employer' %}
+          <a class="btn btn-outline-secondary" href="{% url 'employer_jobs' %}">My Jobs</a>
+          <a class="btn btn-outline-secondary" href="{% url 'create_job' %}">Post a Job</a>
+        {% else %}
+          <a class="btn btn-success" href="{% url 'register_jobseeker' %}">Sign up as Job Seeker</a>
+          <a class="btn btn-outline-success" href="{% url 'register_employer' %}">Sign up as Employer</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 
-</body>
-</html>
+  <div class="col-lg-5">
+    <div class="card p-4">
+      <h2 class="h5 mb-3">Quick tips</h2>
+      <ul class="mb-0">
+        <li class="mb-2"><strong>Job Seekers:</strong> Upload a resume once, then apply to jobs easily.</li>
+        <li class="mb-2"><strong>Employers:</strong> Post jobs and review applications in your dashboard.</li>
+        <li><strong>Activation:</strong> After sign up, activate your account via the email link (printed in the console).</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

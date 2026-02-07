@@ -1,22 +1,44 @@
 {% extends "base.html" %}
-{% block title %}My Resumes{% endblock %}
-
+{% block title %}My Resumes • JobBoard{% endblock %}
 {% block content %}
-<h2>My Resumes</h2>
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h1 class="h4 mb-1">My Resumes</h1>
+    <div class="text-muted">Manage your uploaded resumes.</div>
+  </div>
+  <a class="btn btn-primary" href="{% url 'upload_resume' %}">Upload new</a>
+</div>
 
 {% if resumes %}
-    <ul>
+  <div class="row g-3">
     {% for r in resumes %}
-        <li>
-            {{ r.title|default:"Resume" }} - uploaded at {{ r.created_at|date:"Y-m-d H:i" }}
-            - <a href="{{ r.file.url }}" target="_blank" download>Download</a>
-            {% if r.education %} - Education: {{ r.education }}{% endif %}
-            {% if r.skills %} - Skills: {{ r.skills|truncatechars:80 }}{% endif %}
-        </li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>You have no resumes yet. <a href="{% url 'upload_resume' %}">Upload one now</a>.</p>
-{% endif %}
+      <div class="col-md-6">
+        <div class="card p-3 h-100">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <h2 class="h6 mb-1">{{ r.title|default:"Resume" }}</h2>
+              <div class="text-muted small">Uploaded {{ r.created_at|date:"Y-m-d H:i" }}</div>
+            </div>
+            <span class="badge bg-light text-dark">Resume</span>
+          </div>
 
+          {% if r.education %}<div class="mt-2 small"><strong>Education:</strong> {{ r.education }}</div>{% endif %}
+          {% if r.skills %}<div class="mt-1 small"><strong>Skills:</strong> {{ r.skills|truncatechars:120 }}</div>{% endif %}
+
+          <div class="mt-3">
+            {% if r.file %}
+              <a class="btn btn-outline-secondary btn-sm" href="{{ r.file.url }}" target="_blank" rel="noopener">Download</a>
+            {% else %}
+              <span class="text-muted small">No file</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="card p-4">
+    <p class="mb-0">No resumes yet. <a href="{% url 'upload_resume' %}">Upload your first resume</a>.</p>
+  </div>
+{% endif %}
 {% endblock %}

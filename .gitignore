@@ -1,0 +1,22 @@
+# Python / Django
+__pycache__/
+*.py[cod]
+*.pyd
+
+# Virtualenv
+.venv/
+venv/
+ENV/
+env/
+
+# Environment variables / secrets
+.env
+
+# Logs
+logs/
+*.log
+
+# OS / Editor
+.DS_Store
+.vscode/
+.idea/

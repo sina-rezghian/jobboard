@@ -1,17 +1,100 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Create Job</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Post a Job • JobBoard{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card p-4">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <h1 class="h4 mb-1">Post a new job</h1>
+          <p class="text-muted mb-0">Fill out the details below.</p>
+        </div>
+        <a class="btn btn-outline-secondary btn-sm" href="{% url 'employer_jobs' %}">Back</a>
+      </div>
 
-<h2>Create New Job</h2>
+      <hr class="my-3">
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Create</button>
-</form>
+      <form method="post" novalidate>
+        {% csrf_token %}
 
-</body>
-</html>
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.title.label }}</label>
+          {{ form.title }}
+          <div class="text-danger small">{{ form.title.errors }}</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.location.label }}</label>
+          {{ form.location }}
+          <datalist id="uk-cities">
+            {% for c in cities %}
+              <option value="{{ c }}"></option>
+            {% endfor %}
+          </datalist>
+          <div class="text-danger small">{{ form.location.errors }}</div>
+        </div>
+
+        <div class="row g-2">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">{{ form.job_type.label }}</label>
+            {{ form.job_type }}
+            <div class="text-danger small">{{ form.job_type.errors }}</div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">{{ form.experience_level.label }}</label>
+            {{ form.experience_level }}
+            <div class="text-danger small">{{ form.experience_level.errors }}</div>
+          </div>
+        </div>
+
+        <div class="form-check mb-3">
+          {{ form.cover_letter_required }}
+          <label class="form-check-label" for="{{ form.cover_letter_required.id_for_label }}">
+            {{ form.cover_letter_required.label }}
+          </label>
+          <div class="text-danger small">{{ form.cover_letter_required.errors }}</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.description.label }}</label>
+          {{ form.description }}
+          <div class="text-danger small">{{ form.description.errors }}</div>
+        </div>
+
+        <div class="row g-2">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">{{ form.min_salary.label }}</label>
+            {{ form.min_salary }}
+            <div class="text-danger small">{{ form.min_salary.errors }}</div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">{{ form.max_salary.label }}</label>
+            {{ form.max_salary }}
+            <div class="text-danger small">{{ form.max_salary.errors }}</div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.required_skills.label }}</label>
+          {{ form.required_skills }}
+          <div class="form-text">Comma-separated skills. Example: Python, Django, SQL</div>
+          <div class="text-danger small">{{ form.required_skills.errors }}</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.benefits.label }}</label>
+          {{ form.benefits }}
+          <div class="form-text">Optional: perks, insurance, remote, etc.</div>
+          <div class="text-danger small">{{ form.benefits.errors }}</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create job</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
