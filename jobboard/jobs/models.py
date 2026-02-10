@@ -11,12 +11,12 @@ from accounts.models import EmployerProfile, JobSeekerProfile
 def _tokenize_csv(text: str | None) -> list[str]:
     if not text:
         return []
-    # split by comma / whitespace
+
     raw = []
     for part in text.replace("\n", " ").replace(";", ",").split(","):
         raw.extend(part.split())
     tokens = [t.strip().lower() for t in raw if t.strip()]
-    # unique preserving order
+
     seen=set()
     out=[]
     for t in tokens:
@@ -62,7 +62,7 @@ class JobQuerySet(models.QuerySet):
                         | Q(employer__company_name__icontains=token)
                     )
                 qs = qs.filter(token_cond)
-        # salary overlap logic
+
         if min_salary is not None:
             qs = qs.filter(Q(max_salary__isnull=True) | Q(max_salary__gte=min_salary))
         if max_salary is not None:
@@ -159,7 +159,7 @@ class Job(models.Model):
         help_text="If true, applicants must provide a cover letter.",
     )
 
-    # Phase 4: extra job fields
+
     min_salary = models.PositiveIntegerField(blank=True, null=True)
     max_salary = models.PositiveIntegerField(blank=True, null=True)
     benefits = models.TextField(blank=True, null=True, help_text="Benefits/perks (optional).")

@@ -39,7 +39,6 @@ def _send_activation_email(request, user: User) -> None:
         f"Please activate your account using this link:\n{link}\n\n"
         "If you did not sign up, you can ignore this email."
     )
-    # Console backend prints the email; we ALSO persist it to logs as a demo artifact.
     send_email_demo(
         to_email=user.email,
         subject=subject,
@@ -56,7 +55,6 @@ def _send_activation_email(request, user: User) -> None:
 
 
 def signup_choose(request):
-    """Single entry-point for signup: user chooses Employer vs Job Seeker."""
     return render(request, "accounts/signup_choose.html")
 
 
@@ -220,10 +218,6 @@ def user_logout(request):
 
 
 def sms_activate(request):
-    """Activate user by demo SMS code (extra/bonus feature).
-
-    The code is sent on-demand by calling sms_send_code.
-    """
     if request.method == "POST":
         username = (request.POST.get("username") or "").strip()
         code = (request.POST.get("code") or "").strip()
@@ -305,10 +299,6 @@ def _generate_unique_sms_code(user: User) -> str:
 
 
 def _send_demo_sms_activation(user: User, phone: str | None) -> str:
-    """Demo SMS activation: generates a code and logs it (no paid provider needed).
-
-    The code is stored in Django cache and persisted to DB with TTL enforcement.
-    """
     ttl_seconds = max(60, int(getattr(settings, "SMS_ACTIVATION_TTL_SECONDS", 600)))
     code = _generate_unique_sms_code(user)
     cache.set(f"sms_activation:{user.pk}", code, timeout=ttl_seconds)
@@ -334,7 +324,6 @@ def _send_demo_sms_activation(user: User, phone: str | None) -> str:
 
 @require_POST
 def sms_send_code(request):
-    """Issue a new SMS activation code on explicit user request."""
     username = (request.POST.get("username") or "").strip()
     if not username:
         return JsonResponse({"ok": False, "message": "Please enter your username first."}, status=400)

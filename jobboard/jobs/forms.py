@@ -9,7 +9,7 @@ class _BootstrapMixin:
         for name, field in self.fields.items():
             widget = field.widget
             css = widget.attrs.get("class", "")
-            # avoid adding form-control to checkbox/radio
+   
             if widget.__class__.__name__ in {"CheckboxInput", "RadioSelect"}:
                 continue
             widget.attrs["class"] = (css + " form-control").strip()
@@ -38,8 +38,7 @@ class JobForm(_BootstrapMixin, forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # City autocomplete: browser-native filtering as the user types.
-        # (We render the datalist in templates; this just binds the input to it.)
+
         self.fields["location"].widget = forms.TextInput(
             attrs={"placeholder": "e.g. London", "list": "uk-city-list"}
         )
@@ -61,13 +60,7 @@ class JobForm(_BootstrapMixin, forms.ModelForm):
 
 
 class JobApplicationForm(_BootstrapMixin, forms.ModelForm):
-    """Application form.
-
-    We keep it lightweight: resume comes from the user's single uploaded resume
-    (enforced elsewhere), and we support an optional note.
-
-    Pass `job=` to enforce the employer's cover-letter requirement.
-    """
+    
 
     class Meta:
         model = JobApplication
@@ -82,7 +75,7 @@ class JobApplicationForm(_BootstrapMixin, forms.ModelForm):
         self.job = job
         self._bootstrap()
 
-        # Cover letter: optional unless employer requires it.
+
         required = bool(getattr(job, "cover_letter_required", False))
         self.fields["cover_letter"].required = required
         self.fields["cover_letter"].widget.attrs.setdefault(

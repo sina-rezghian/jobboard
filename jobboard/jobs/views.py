@@ -88,7 +88,6 @@ _SKILL_STOPWORDS = {
 
 
 def _extract_skill_tokens(*values):
-    """Extract ordered skill-like tokens from free text."""
     out = []
     seen = set()
     for value in values:
@@ -175,7 +174,6 @@ def _search_skill_suggestions(request, limit=12):
 
 
 def _apply_skill_suggestions(job, seeker_profile, latest_resume, limit=10):
-    """Recommend skills to mention in the application cover letter."""
     ordered = []
     seen = set()
 
@@ -219,7 +217,6 @@ def _apply_skill_suggestions(job, seeker_profile, latest_resume, limit=10):
 
 
 def _last_7_days_application_series(apps_qs):
-    """Return labels/values for last 7 days including today."""
     today = timezone.localdate()
     start = today - timedelta(days=6)
     days = [start + timedelta(days=i) for i in range(7)]
@@ -370,13 +367,7 @@ def job_list(request):
         cover_letter_required=cover_letter_required,
     )
 
-    # Salary filtering is handled in JobQuerySet.search() with overlap semantics:
-    # - requested min salary => keep jobs whose max can reach that value
-    # - requested max salary => keep jobs whose min is not above that value
-
-    # Location (city) filter
-    # - empty/"all" should not filter
-    # - users may type partial city names, so we use icontains
+ 
     if city and city.strip().lower() not in {"all", "all cities", "any"}:
         qs = qs.filter(location__icontains=city.strip())
 
@@ -388,8 +379,6 @@ def job_list(request):
         sort = "newest"
         qs = qs.order_by("-created_at")
 
-    # City dropdown: fixed list (England), alphabetically.
-    # This also enables quick-jump on keypress (e.g. typing "f" jumps to first city starting with f).
     cities = ENGLAND_CITIES
     page_obj = _paginate(request, qs, per_page=10)
     page_jobs = list(page_obj.object_list)
@@ -529,7 +518,7 @@ def apply_job(request, job_id):
                     },
                 )
             except Exception:
-                # Never break the UX because of demo services.
+               
                 notify_failed = True
                 logger.exception("Demo notification failed")
 
@@ -636,10 +625,7 @@ def employer_applications(request):
 
 @employer_required
 def employer_sms_log(request):
-    """Employer: view demo SMS messages sent for their job applications.
 
-    We filter SMS JSON lines by meta.employer_user_id == request.user.id.
-    """
     try:
         EmployerProfile.objects.get(user=request.user)
     except EmployerProfile.DoesNotExist:
@@ -649,7 +635,7 @@ def employer_sms_log(request):
     log_path = getattr(settings, "SMS_DEMO_LOG", None)
     entries = []
 
-    # Prefer per-employer demo log if available (LOG_DIR/sms/employer_<id>.jsonl)
+
     base_dir = None
     if log_path:
         base_dir = Path(str(log_path)).parent
@@ -668,7 +654,7 @@ def employer_sms_log(request):
                     entries.append(obj)
                 except Exception:
                     continue
-        # Already employer-scoped; no need to parse the global file
+
         return render(request, "jobs/employer_sms_log.html", {"entries": entries})
 
     if log_path:
@@ -678,7 +664,6 @@ def employer_sms_log(request):
                 line = raw.strip()
                 if not line:
                     continue
-                # Preferred: JSON lines
                 if line.startswith("{"):
                     try:
                         obj = json.loads(line)
@@ -688,15 +673,14 @@ def employer_sms_log(request):
                     if meta.get("employer_user_id") == request.user.id:
                         entries.append(obj)
                 else:
-                    # Legacy line format (no employer info) -> skip for safety
                     continue
 
-    # Optional filtering by kind (interview/rejected)
+
     kind = request.GET.get("kind")
     if kind in {"interview", "rejected"}:
         entries = [e for e in entries if (e.get("meta") or {}).get("kind") == kind]
 
-    # Newest first
+
     entries = list(reversed(entries))
 
     return render(
@@ -708,7 +692,7 @@ def employer_sms_log(request):
 def application_detail(request, application_id):
     application = get_object_or_404(JobApplication, id=application_id)
 
-    # can view: owner employer (job.employer.user) OR the job seeker user
+    
     can_manage = False
     employer_profile = None
     if request.user.is_authenticated:
@@ -729,7 +713,7 @@ def application_detail(request, application_id):
     if next_url and not url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
         next_url = None
 
-    # Employer notes (internal)
+   
     if request.method == "POST" and can_manage:
         note_content = (request.POST.get("note_content") or "").strip()
         if note_content:
@@ -1061,8 +1045,6 @@ def home_public(request):
         EmployerProfile.objects.annotate(jobs_count=Count("jobs"))
         .order_by("-jobs_count", "company_name")[:8]
     )
-    # Stats shown in the hero area. We intentionally DO NOT show global "applications"
-    # counts to job seekers (requested), and for employers we show only their own.
     show_applications_stat = False
     applications_count = None
     if request.user.is_authenticated:
@@ -1074,7 +1056,6 @@ def home_public(request):
                 show_applications_stat = True
             except EmployerProfile.DoesNotExist:
                 pass
-        # jobseeker: do not show
 
     stats = {
         "jobs": Job.objects.count(),

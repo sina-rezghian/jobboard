@@ -4,13 +4,6 @@ from django.db import models
 
 
 class User(AbstractUser):
-    """Custom user model (Phase 3).
-
-    We keep it minimal and compatible with Django auth, while adding:
-    - unique email
-    - role (employer / jobseeker)
-    - email verification flag
-    """
     class Role(models.TextChoices):
         EMPLOYER = "employer", "Employer"
         JOBSEEKER = "jobseeker", "Job Seeker"

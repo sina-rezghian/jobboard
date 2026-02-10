@@ -23,7 +23,6 @@ def upload_resume(request):
     if request.method == "POST":
         form = ResumeUploadForm(request.POST, request.FILES)
         if form.is_valid():
-            # Only one resume is kept per job seeker (latest replaces older ones)
             Resume.objects.filter(jobseeker=seeker_profile).delete()
             resume = form.save(commit=False)
             resume.jobseeker = seeker_profile

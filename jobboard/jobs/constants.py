@@ -98,5 +98,4 @@ UK_CITIES = sorted(
 )
 
 
-# Backwards-compatible alias (older code used ENGLAND_CITIES).
 ENGLAND_CITIES = UK_CITIES

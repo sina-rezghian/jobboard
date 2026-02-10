@@ -1,12 +1,3 @@
-"""Email demo helpers.
-
-Goal:
-- Keep development simple (console backend, no paid SMTP required)
-- Also store every outgoing email in log files for demo/testing
-
-This is NOT a production-grade email service.
-"""
-
 from __future__ import annotations
 
 import json
@@ -29,11 +20,8 @@ def _append_jsonl(path: Path, payload: dict[str, Any]) -> None:
 
 def send_email_demo(
     *,
-    # Primary arg name used across the project
     to_emails: Iterable[str] | None = None,
-    # Alternate arg name (older code) – keep compatibility
     to_email: str | None = None,
-    # Optional override (not required in demo, but some code passes it)
     from_email: str | None = None,
     subject: str,
     message: str,
@@ -41,12 +29,10 @@ def send_email_demo(
     meta: dict[str, Any] | None = None,
     **_ignored: Any,
 ) -> None:
-    """Send email via Django's configured backend and also store it to log files."""
 
-    # Normalize recipients
+    
     if to_emails is None:
         to_emails = []
-    # If caller used to_email=..., fold it in
     if to_email:
         to_emails = list(to_emails) + [to_email]
 
@@ -65,7 +51,6 @@ def send_email_demo(
         "meta": meta,
     }
 
-    # Global file
     log_path = getattr(settings, "EMAIL_DEMO_LOG", None)
     if not log_path:
         log_dir = Path(getattr(settings, "LOG_DIR", "."))
@@ -74,17 +59,16 @@ def send_email_demo(
 
     _append_jsonl(log_path, payload)
 
-    # ---- Copy/paste-friendly outbox (plain text) ----
     base_dir = log_path.parent
     (base_dir / "email").mkdir(parents=True, exist_ok=True)
 
-    # Prefer explicit activation link if provided; otherwise extract the first URL.
+
     link = meta.get("activation_link") if isinstance(meta, dict) else None
     if not link:
         m = re.search(r"https?://\S+", message or "")
         link = m.group(0) if m else ""
 
-    # Global outbox
+
     outbox_txt = base_dir / "email_outbox.txt"
     with outbox_txt.open("a", encoding="utf-8") as f:
         f.write("=" * 72 + "\n")
@@ -97,7 +81,7 @@ def send_email_demo(
         f.write("\n")
         f.write((message or "").strip() + "\n\n")
 
-    # Per-recipient outbox
+
     def _safe_name(value: str) -> str:
         return re.sub(r"[^a-zA-Z0-9_.-]", "_", value)
 
@@ -109,7 +93,7 @@ def send_email_demo(
                 f.write(f"Link: {link}\n")
             f.write("---\n")
 
-    # Optional grouping for employer/user dashboards
+
     employer_id = meta.get("employer_user_id") or meta.get("employer_id") if isinstance(meta, dict) else None
     if employer_id:
         _append_jsonl(base_dir / "email" / f"employer_{employer_id}.jsonl", payload)
@@ -117,7 +101,7 @@ def send_email_demo(
     if user_id:
         _append_jsonl(base_dir / "email" / f"user_{user_id}.jsonl", payload)
 
-    # Actually send (console backend by default in dev)
+
     send_mail(
         subject=subject,
         message=message,

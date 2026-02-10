@@ -207,13 +207,4 @@ If `manage.py test` fails with `permission denied to create database`, grant Pos
 - `jobs`: job posting/search, applications, interview/reject flow, alerts, recommendations, dashboards
 - `resumes`: resume upload/list
 
-## 13. Security and Production Notes
 
-For deployment, you must:
-
-- set strong `DJANGO_SECRET_KEY`
-- set `DJANGO_DEBUG=0`
-- set explicit `DJANGO_ALLOWED_HOSTS`
-- configure real email backend / SMTP
-- replace demo SMS logger with real SMS provider integration
-- configure static/media serving and HTTPS

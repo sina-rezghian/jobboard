@@ -1,5 +1,5 @@
 (function(){
-  // theme toggle
+
   const key="jobboard_theme";
   const root=document.documentElement;
   const btn=document.getElementById("themeToggle");
@@ -18,7 +18,7 @@
     });
   }
 
-  // Auto RTL if page contains a lot of Persian/Arabic chars and user hasn't set a preference
+
   try{
     const curDir=document.documentElement.getAttribute("dir");
     if(!curDir){

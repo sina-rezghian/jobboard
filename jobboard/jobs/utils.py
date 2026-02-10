@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 
 def _alert_label(alert) -> str:
-    """Build a readable label for alerts without requiring a dedicated name field."""
+   
     parts = []
     if getattr(alert, "keywords", None):
         parts.append(f"keywords: {alert.keywords}")
@@ -18,10 +18,6 @@ def _alert_label(alert) -> str:
 
 
 def send_application_status_notification(application, *, kind: str):
-    """Send notification to job seeker when status changes.
-
-    kind: 'interview' or 'rejected'
-    """
     user = application.jobseeker.user
     to_email = getattr(user, "email", None)
     job_title = application.job.title
@@ -53,7 +49,6 @@ def send_application_status_notification(application, *, kind: str):
     else:
         return
 
-    # In-app notification for the job seeker panel.
     try:
         title = (
             f"Interview scheduled for {job_title}"
@@ -74,7 +69,6 @@ def send_application_status_notification(application, *, kind: str):
     except Exception:
         logger.exception("In-app notification failed: kind=%s app_id=%s", kind, application.id)
 
-    # Email (demo-friendly): uses Django backend + also writes to log files
     if to_email:
         meta = {
             "kind": kind,
@@ -96,7 +90,7 @@ def send_application_status_notification(application, *, kind: str):
         except Exception:
             logger.exception("Email notification failed: kind=%s to=%s app_id=%s", kind, to_email, application.id)
 
-    # SMS demo: store message in a file (no paid provider needed)
+
     phone = getattr(application.jobseeker, "phone", None)
     if phone:
         send_sms_demo(
@@ -194,10 +188,7 @@ def _job_matches_alert(alert, job, title_desc: str, job_skills: set[str]) -> boo
 
 
 def _create_alert_match_and_notify(alert, job, job_alert_match_model) -> bool:
-    """Create JobAlertMatch and fan out notifications for a match.
 
-    Returns True when a new match is created.
-    """
     try:
         _match, created = job_alert_match_model.objects.get_or_create(alert=alert, job=job)
         if not created:

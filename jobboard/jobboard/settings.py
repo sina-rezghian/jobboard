@@ -87,7 +87,7 @@ AUTH_USER_MODEL = "accounts.User"
 # -----------------------------
 # Session management (Phase 3)
 # -----------------------------
-# 1 hour default session age (can be overridden)
+
 SESSION_COOKIE_AGE = int(os.getenv("SESSION_COOKIE_AGE", "3600"))
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
@@ -118,8 +118,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # -----------------------------
 # Email (Phase 4 - Activation)
 # -----------------------------
-# For development: print emails in the console.
-# For real SMTP, set EMAIL_BACKEND + EMAIL_HOST/... via env.
 EMAIL_BACKEND = os.getenv(
     "EMAIL_BACKEND",
     "django.core.mail.backends.console.EmailBackend",

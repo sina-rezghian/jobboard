@@ -22,7 +22,6 @@ logger = logging.getLogger(__name__)
 
 
 def _append_jsonl(path: Path, payload: dict[str, Any]) -> None:
-    """Append a JSON line to a file, ensuring its parent directory exists."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as f:
         f.write(json.dumps(payload, ensure_ascii=False) + "\n")
@@ -35,10 +34,6 @@ def send_sms_demo(
     tag: str = "SMS DEMO",
     meta: dict[str, Any] | None = None,
 ) -> Path | None:
-    """Write a demo SMS to a local file.
-
-    The message is stored as JSON Lines (one JSON object per line).
-    """
     try:
         log_path = getattr(settings, "SMS_DEMO_LOG", None)
         if not log_path:

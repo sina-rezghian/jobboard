@@ -49,7 +49,7 @@ body{
   text-decoration: underline !important;
 }
 
-/* Sticky footer: keep footer at bottom on short pages (without touching templates) */
+
 html, body { height: 100%; }
 body { min-height: 100vh; display: flex; flex-direction: column; }
 main { flex: 1 0 auto; }

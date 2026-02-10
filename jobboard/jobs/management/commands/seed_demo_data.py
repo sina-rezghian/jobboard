@@ -188,7 +188,7 @@ class Command(BaseCommand):
             seeker_profiles.append(profile)
             seeker_creds.append((username, password))
 
-            # Keep exactly one resume for each seeded seeker profile.
+        
             resume = Resume.objects.filter(jobseeker=profile).order_by("-created_at").first()
             if not resume:
                 resume = Resume(
@@ -205,7 +205,7 @@ class Command(BaseCommand):
                     save=True,
                 )
 
-            # One predictable alert per seeker for match/demo inbox.
+
             JobAlert.objects.get_or_create(
                 jobseeker=profile,
                 keywords="developer, engineer",
@@ -216,11 +216,11 @@ class Command(BaseCommand):
                 defaults={"is_enabled": True},
             )
 
-            # Save a couple of jobs.
+       
             for job in rnd.sample(created_jobs, k=min(2, len(created_jobs))):
                 SavedJob.objects.get_or_create(job=job, jobseeker=profile)
 
-        # Seed applications after seekers + resumes exist.
+
         for profile in seeker_profiles:
             resume = Resume.objects.filter(jobseeker=profile).order_by("-created_at").first()
             resume_name = resume.file.name if resume and resume.file else f"resumes/{profile.user.username}_resume.txt"
@@ -257,7 +257,7 @@ class Command(BaseCommand):
                         url=f"/jobs/application/{application.id}/",
                     )
 
-        # Backfill alert matches + notifications for existing jobs.
+   
         for profile in seeker_profiles:
             for alert in JobAlert.objects.filter(jobseeker=profile, is_enabled=True):
                 created_matches = process_alert_matches_for_alert(alert, limit=500)
@@ -269,7 +269,6 @@ class Command(BaseCommand):
                         url="/jobs/alerts/inbox/",
                     )
 
-        # Extra baseline notification data for both roles.
         for username, _pwd in employer_creds:
             user = User.objects.filter(username=username).first()
             if user:

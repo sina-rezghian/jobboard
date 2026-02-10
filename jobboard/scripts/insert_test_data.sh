@@ -1,11 +1,5 @@
-#!/usr/bin/env bash
-set -euo pipefail
 
-# Usage:
-#   scripts/insert_test_data.sh [prefix] [password] [employers] [jobseekers] [jobs_per_employer] [applications_per_seeker]
-#
-# Example:
-#   scripts/insert_test_data.sh demo DemoPass123! 5 10 4 3
+set -euo pipefail
 
 PREFIX="${1:-demo}"
 PASSWORD="${2:-DemoPass123!}"
@@ -22,7 +16,7 @@ if [[ ! -x "${PYTHON_BIN}" ]]; then
   exit 1
 fi
 
-# Default to PostgreSQL.
+
 export DB_ENGINE="${DB_ENGINE:-django.db.backends.postgresql}"
 
 echo "Running migrations (DB_ENGINE=${DB_ENGINE})..."
