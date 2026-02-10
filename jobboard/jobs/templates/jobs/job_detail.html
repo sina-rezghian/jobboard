@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}{{ job.title }} • JobBoard{% endblock %}
+{% block content %}
+<div class="card p-4">
+  <div class="d-flex justify-content-between align-items-start">
+    <div>
+      <h1 class="h4 mb-1">{{ job.title }}</h1>
+      <div class="text-muted">
+        {% if job.employer and job.employer.company_name %}
+          <strong>{{ job.employer.company_name }}</strong> •
+        {% endif %}
+        {{ job.location }} • {{ job.get_job_type_display }} • {{ job.get_experience_level_display }} • Posted {{ job.created_at|date:"Y-m-d" }}
+        {% if job.min_salary or job.max_salary %}
+          • Salary (USD):
+          ${% if job.min_salary %}{{ job.min_salary }}{% else %}?{% endif %}
+          -
+          ${% if job.max_salary %}{{ job.max_salary }}{% else %}?{% endif %} USD
+        {% endif %}
+      </div>
+    </div>
+    <div class="d-flex gap-2">
+      {% if user.is_authenticated and user.role == 'employer' and job.employer.user_id == user.id %}
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'edit_job' job.id %}">Edit</a>
+      {% endif %}
+      <a class="btn btn-outline-secondary btn-sm" href="{% url 'job_list' %}">Back</a>
+    </div>
+  </div>
+
+  <hr class="my-3">
+  <div class="d-flex flex-wrap gap-2 mb-3">
+    <span class="badge bg-light text-dark border">{{ job.get_job_type_display }}</span>
+    <span class="badge bg-light text-dark border">{{ job.get_experience_level_display }}</span>
+    {% if job.cover_letter_required %}<span class="badge bg-primary">Cover letter required</span>{% else %}<span class="badge bg-light text-dark border">Cover letter optional</span>{% endif %}
+  </div>
+
+
+  {% if job.required_skills %}
+    <div class="mb-3">
+      <div class="text-uppercase text-muted small mb-2">Required skills</div>
+      <div class="d-flex flex-wrap gap-1">
+        {% for s in job.skills_list %}
+          <span class="badge bg-secondary">{{ s }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if job.benefits %}
+    <div class="mb-3">
+      <div class="text-uppercase text-muted small mb-2">Benefits</div>
+      <p class="mb-0" style="white-space: pre-wrap;">{{ job.benefits }}</p>
+    </div>
+  {% endif %}
+
+  <div class="mb-3">
+    <div class="text-uppercase text-muted small mb-2">Description</div>
+    <p class="mb-0" style="white-space: pre-wrap;">{{ job.description }}</p>
+  </div>
+
+  <div class="d-flex flex-wrap gap-2">
+    {% if user.is_authenticated and user.role == 'jobseeker' %}
+      <a class="btn btn-primary" href="{% url 'apply_job' job.id %}">Apply now</a>
+      <a
+        class="btn {% if is_saved %}btn-success{% else %}btn-outline-secondary{% endif %}"
+        href="{% url 'toggle_saved_job' job.id %}?next={{ request.get_full_path|urlencode }}"
+      >{% if is_saved %}Saved{% else %}Save job{% endif %}</a>
+	  {% elif not user.is_authenticated %}
+	    {% url 'apply_job' job.id as apply_url %}
+	    <a class="btn btn-primary" href="{% url 'login' %}?next={{ apply_url|urlencode }}">Login to apply</a>
+    {% endif %}
+
+    {% if user.is_authenticated and user.role == 'employer' and job.employer.user_id == user.id %}
+      <a class="btn btn-outline-dark" href="{% url 'view_applications' job.id %}">Applications for this job</a>
+      <a class="btn btn-outline-dark" href="{% url 'employer_applications' %}">All applications</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

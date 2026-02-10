@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Applications • {{ job.title }}{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h1 class="h4 mb-1">Applications</h1>
+    <div class="text-muted">{{ job.title }} • {{ job.location }}</div>
+  </div>
+  <a class="btn btn-outline-secondary btn-sm" href="{% url 'job_detail' job.id %}">Back</a>
+</div>
+
+{% if applications %}
+  <div class="card p-3">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Candidate</th>
+            <th>Status</th>
+            <th>Submitted</th>
+            <th>Interview</th>
+            <th>Resume</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in applications %}
+            <tr>
+              <td>
+                <strong>{{ a.jobseeker.user.username }}</strong>
+                {% if a.jobseeker.full_name %}<div class="text-muted small">{{ a.jobseeker.full_name }}</div>{% endif %}
+              </td>
+              <td>
+                {% if a.status == 'submitted' %}
+                  <span class="badge bg-primary">Submitted</span>
+                {% elif a.status == 'interview' %}
+                  <span class="badge bg-warning text-dark">Interview</span>
+                {% elif a.status == 'rejected' %}
+                  <span class="badge bg-danger">Rejected</span>
+                {% else %}
+                  <span class="badge bg-secondary">{{ a.status }}</span>
+                {% endif %}
+              </td>
+              <td class="text-muted">{{ a.submitted_at|date:"Y-m-d H:i" }}</td>
+              <td class="text-muted">
+                {% if a.interview_date %}{{ a.interview_date|date:"Y-m-d" }}{% else %}—{% endif %}
+              </td>
+              <td>
+                {% if a.resume %}
+                  <a href="{{ a.resume.url }}" target="_blank" rel="noopener">Download</a>
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td class="text-end">
+                <div class="d-inline-flex gap-2">
+                  <a class="btn btn-outline-primary btn-sm" href="{% url 'application_detail' a.id %}?next={{ request.get_full_path|urlencode }}">Details</a>
+                  <a class="btn btn-outline-secondary btn-sm" href="{% url 'schedule_interview' a.id %}?next={{ request.get_full_path|urlencode }}">Schedule</a>
+                  {% if a.status != 'rejected' %}
+                    <a class="btn btn-outline-danger btn-sm" href="{% url 'reject_application' a.id %}?next={{ request.get_full_path|urlencode }}">Reject</a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% if a.cover_letter %}
+              <tr>
+                <td colspan="6" class="bg-light">
+                  <div class="small text-muted mb-1">Cover letter</div>
+                  <div style="white-space: pre-wrap;">{{ a.cover_letter }}</div>
+                </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% else %}
+  <div class="card p-4">
+    <p class="mb-0">No applications yet.</p>
+  </div>
+{% endif %}
+{% endblock %}

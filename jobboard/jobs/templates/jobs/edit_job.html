@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Edit Job • JobBoard{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card p-4">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <h1 class="h4 mb-1">Edit job</h1>
+          <div class="text-muted">{{ job.title }}</div>
+        </div>
+        <a class="btn btn-outline-secondary btn-sm" href="{% url 'employer_jobs' %}">Back</a>
+      </div>
+
+      <hr class="my-3">
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.title.label }}</label>
+          {{ form.title }}
+          <div class="text-danger small">{{ form.title.errors }}</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.location.label }}</label>
+          {{ form.location }}
+          <datalist id="uk-city-list">
+            {% for c in cities %}
+              <option value="{{ c }}"></option>
+            {% endfor %}
+          </datalist>
+          <div class="text-danger small">{{ form.location.errors }}</div>
+        </div>
+
+        <div class="row g-2">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">{{ form.job_type.label }}</label>
+            {{ form.job_type }}
+            <div class="text-danger small">{{ form.job_type.errors }}</div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">{{ form.experience_level.label }}</label>
+            {{ form.experience_level }}
+            <div class="text-danger small">{{ form.experience_level.errors }}</div>
+          </div>
+        </div>
+
+        <div class="form-check mb-3">
+          {{ form.cover_letter_required }}
+          <label class="form-check-label" for="{{ form.cover_letter_required.id_for_label }}">
+            {{ form.cover_letter_required.label }}
+          </label>
+          <div class="text-danger small">{{ form.cover_letter_required.errors }}</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.description.label }}</label>
+          {{ form.description }}
+          <div class="text-danger small">{{ form.description.errors }}</div>
+        </div>
+
+        <div class="row g-2">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">{{ form.min_salary.label }}</label>
+            {{ form.min_salary }}
+            <div class="text-danger small">{{ form.min_salary.errors }}</div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">{{ form.max_salary.label }}</label>
+            {{ form.max_salary }}
+            <div class="text-danger small">{{ form.max_salary.errors }}</div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.required_skills.label }}</label>
+          {{ form.required_skills }}
+          {% if skill_suggestions %}
+            <div id="required-skills-suggestions" class="mt-2 d-flex flex-wrap gap-1">
+              {% for s in skill_suggestions %}
+                <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2 js-required-skill" data-skill="{{ s }}">{{ s }}</button>
+              {% endfor %}
+            </div>
+          {% endif %}
+          <div class="form-text">Comma-separated skills. Example: Python, Django, SQL</div>
+          <div class="text-danger small">{{ form.required_skills.errors }}</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.benefits.label }}</label>
+          {{ form.benefits }}
+          <div class="text-danger small">{{ form.benefits.errors }}</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save changes</button>
+        <a class="btn btn-outline-secondary" href="{% url 'job_detail' job.id %}">View</a>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const input = document.getElementById("id_required_skills");
+    const box = document.getElementById("required-skills-suggestions");
+    if (!input || !box) return;
+
+    function addSkill(skill) {
+      const parts = (input.value || "").split(",").map((p) => p.trim()).filter(Boolean);
+      if (!parts.some((p) => p.toLowerCase() === skill.toLowerCase())) {
+        parts.push(skill);
+      }
+      input.value = parts.join(", ");
+      input.focus();
+    }
+
+    function render(items) {
+      box.innerHTML = "";
+      items.forEach((item) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn btn-outline-secondary btn-sm py-0 px-2";
+        btn.textContent = item;
+        btn.addEventListener("click", () => addSkill(item));
+        box.appendChild(btn);
+      });
+    }
+
+    async function refresh() {
+      const parts = (input.value || "").split(",");
+      const q = (parts[parts.length - 1] || "").trim();
+      try {
+        const res = await fetch("{% url 'skill_suggestions_api' %}?q=" + encodeURIComponent(q));
+        if (!res.ok) return;
+        const data = await res.json();
+        if (Array.isArray(data.items)) render(data.items);
+      } catch (err) {}
+    }
+
+    box.querySelectorAll(".js-required-skill").forEach((btn) => {
+      btn.addEventListener("click", () => addSkill(btn.dataset.skill || btn.textContent || ""));
+    });
+    input.addEventListener("input", refresh);
+  })();
+</script>
+{% endblock %}

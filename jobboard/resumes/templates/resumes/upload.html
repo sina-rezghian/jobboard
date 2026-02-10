@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Upload Resume • JobBoard{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card p-4">
+      <h1 class="h4 mb-1">Upload a resume</h1>
+      <p class="text-muted mb-3">Add a resume file and a few details. You can upload multiple versions.</p>
+
+      <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="mb-3">
+          <label class="form-label">File</label>
+          {{ form.file }}
+          <div class="text-danger small">{{ form.file.errors }}</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Title</label>
+          {{ form.title }}
+          <div class="text-danger small">{{ form.title.errors }}</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Education</label>
+          {{ form.education }}
+          <div class="text-danger small">{{ form.education.errors }}</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Skills</label>
+          {{ form.skills }}
+          <div class="text-danger small">{{ form.skills.errors }}</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Upload</button>
+        <a class="btn btn-link" href="{% url 'resume_list' %}">Back</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

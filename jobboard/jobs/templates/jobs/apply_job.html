@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Apply • {{ job.title }}{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="card p-4 h-100">
+      <h1 class="h5 mb-2">Applying for</h1>
+      <div class="mb-1 fw-semibold">{{ job.title }}</div>
+      <div class="text-muted small">{{ job.location }}</div>
+      <div class="mt-2">
+        <span class="badge bg-light text-dark border">{{ job.get_job_type_display }}</span>
+        <span class="badge bg-light text-dark border">{{ job.get_experience_level_display }}</span>
+        {% if job.cover_letter_required %}
+          <span class="badge bg-primary">Cover letter required</span>
+        {% else %}
+          <span class="badge bg-light text-dark border">Cover letter optional</span>
+        {% endif %}
+      </div>
+      <hr>
+      <p class="text-muted mb-0">{{ job.description|truncatechars:300 }}</p>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="card p-4">
+      <h2 class="h5 mb-1">Submit your application</h2>
+      <p class="text-muted mb-3">
+        Your latest uploaded resume will be used automatically.
+        {% if latest_resume %}
+          <span class="small">(Resume: {{ latest_resume.file.name }})</span>
+        {% endif %}
+      </p>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="mb-3">
+          <label class="form-label">Cover letter {% if job.cover_letter_required %}<span class="text-danger">*</span>{% endif %}</label>
+          {{ form.cover_letter }}
+          <div class="form-text">Tip: keep it short and specific.</div>
+          <div class="text-danger small">{{ form.cover_letter.errors }}</div>
+        </div>
+
+        {% if skill_suggestions %}
+          <div class="mb-3">
+            <label class="form-label">Recommended skills to mention</label>
+            <div class="d-flex flex-wrap gap-1">
+              {% for s in skill_suggestions %}
+                <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2 js-apply-skill" data-skill="{{ s }}">{{ s }}</button>
+              {% endfor %}
+            </div>
+            <div class="form-text">Click a skill to append it to your cover letter.</div>
+          </div>
+        {% endif %}
+
+        <div class="mb-3">
+          <label class="form-label">Note to employer (optional)</label>
+          {{ form.note }}
+          <div class="text-danger small">{{ form.note.errors }}</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Send application</button>
+        <a class="btn btn-link" href="{% url 'job_detail' job.id %}">Cancel</a>
+      </form>
+    </div>
+
+    <div class="alert alert-info mt-3 mb-0">
+      Need to change your resume? <a href="{% url 'upload_resume' %}" class="alert-link">Upload a new one</a> (it replaces the old file).
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const cover = document.getElementById("id_cover_letter");
+    if (!cover) return;
+    document.querySelectorAll(".js-apply-skill").forEach((btn) => {
+      btn.addEventListener("click", function () {
+        const skill = (this.dataset.skill || "").trim();
+        if (!skill) return;
+        const text = cover.value || "";
+        if (new RegExp(`\\b${skill.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(text)) {
+          cover.focus();
+          return;
+        }
+        const suffix = text.trim().length ? ", " : "";
+        cover.value = `${text.trim()}${suffix}${skill}`;
+        cover.focus();
+      });
+    });
+  })();
+</script>
+{% endblock %}

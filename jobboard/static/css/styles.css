@@ -1,0 +1,58 @@
+:root{
+  --brand: #3bb3ff;
+  --brand-2:#1f8ed6;
+}
+
+.navbar-brand .dot{ color: var(--brand); }
+
+.hero{
+  background: linear-gradient(135deg, rgba(59,179,255,.15), rgba(59,179,255,.05));
+  border: 1px solid rgba(0,0,0,.05);
+}
+
+.job-card{
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.job-card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.08);
+}
+
+.mini-company{
+  border: 1px solid rgba(0,0,0,.06);
+  transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+.mini-company:hover{
+  border-color: rgba(13,110,253,.4);
+  box-shadow: 0 .5rem 1rem rgba(13,110,253,.08);
+  transform: translateY(-1px);
+}
+
+.badge-soft{
+  background: rgba(59,179,255,.12);
+  color: var(--brand-2);
+  border: 1px solid rgba(59,179,255,.25);
+}
+
+body{
+  font-family: Inter, Vazirmatn, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+.job-card .h5 a,
+.job-card .h6 a{
+  color: #0d6efd;
+}
+
+.job-card .h5 a:hover,
+.job-card .h6 a:hover{
+  text-decoration: underline !important;
+}
+
+/* Sticky footer: keep footer at bottom on short pages (without touching templates) */
+html, body { height: 100%; }
+body { min-height: 100vh; display: flex; flex-direction: column; }
+main { flex: 1 0 auto; }
+footer { margin-top: auto; }
+
+[dir="rtl"] .ms-auto{ margin-left: 0 !important; margin-right: auto !important; }

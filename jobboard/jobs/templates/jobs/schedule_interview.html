@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Schedule Interview{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card p-4">
+      <h1 class="h5 mb-1">Schedule interview</h1>
+      <p class="text-muted mb-3">Candidate: <strong>{{ application.jobseeker.user.username }}</strong> • Job: <strong>{{ application.job.title }}</strong></p>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
+        <div class="mb-3">
+          <label class="form-label">Interview date</label>
+          <input class="form-control" type="date" name="interview_date" value="{{ application.interview_date|date:'Y-m-d' }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Interview time</label>
+          <input class="form-control" type="time" name="interview_time" value="{{ application.interview_time|time:'H:i' }}">
+        </div>
+
+        <button class="btn btn-primary" type="submit">Save</button>
+        <a class="btn btn-link" href="{% if request.GET.next %}{{ request.GET.next }}{% else %}{% url 'view_applications' application.job.id %}{% endif %}">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

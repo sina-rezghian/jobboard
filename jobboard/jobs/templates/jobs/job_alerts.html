@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Job Alerts • JobBoard{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="card p-3">
+      <h1 class="h5 mb-2">Create Alert</h1>
+      <div class="text-muted small mb-3">Save your search. When a new job matches, it appears in your Alert Inbox.</div>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary">Save Alert</button>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="card p-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">My Alerts</h2>
+        <a class="btn btn-outline-secondary btn-sm" href="{% url 'alert_inbox' %}">Go to Inbox</a>
+      </div>
+      <hr>
+      {% if alerts %}
+        <div class="vstack gap-2">
+          {% for a in alerts %}
+            <div class="border rounded p-2">
+              <div class="d-flex justify-content-between align-items-start gap-2">
+                <div>
+                  <div class="small">
+                    <span class="badge bg-info-subtle text-info border">Enabled: {{ a.is_enabled }}</span>
+                    {% if a.location %}<span class="badge bg-light text-dark border">{{ a.location }}</span>{% endif %}
+                    {% if a.min_salary or a.max_salary %}<span class="badge bg-success-subtle text-success border">{{ a.min_salary|default:"?" }} - {{ a.max_salary|default:"?" }}</span>{% endif %}
+                  </div>
+                  <div class="mt-1"><strong>Keywords:</strong> {{ a.keywords|default:"-" }}</div>
+                  <div class="mt-1"><strong>Skills:</strong> {{ a.skills|default:"-" }}</div>
+                </div>
+                <a class="btn btn-outline-danger btn-sm" href="{% url 'delete_job_alert' a.id %}">Delete</a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="mb-0 text-muted">No alerts yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

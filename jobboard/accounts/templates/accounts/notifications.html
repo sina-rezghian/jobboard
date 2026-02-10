@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Notifications • JobBoard{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1 class="h4 mb-0">Notifications</h1>
+  <form method="post" action="{% url 'notifications_mark_all_read' %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.path }}">
+    <button class="btn btn-outline-secondary btn-sm" type="submit">Mark all as read</button>
+  </form>
+</div>
+
+<div class="card">
+  <div class="list-group list-group-flush">
+    {% for n in notifications %}
+      <div class="list-group-item d-flex gap-3 align-items-start">
+        <div class="mt-1">
+          {% if n.is_read %}
+            <span class="badge bg-light text-dark border">Read</span>
+          {% else %}
+            <span class="badge bg-primary">New</span>
+          {% endif %}
+        </div>
+        <div class="flex-grow-1">
+          <div class="fw-semibold">{{ n.title }}</div>
+          {% if n.message %}<div class="text-muted small">{{ n.message }}</div>{% endif %}
+          <div class="text-muted small">{{ n.created_at }}</div>
+          {% if n.url %}
+            <a class="small" href="{{ n.url }}">Open</a>
+          {% endif %}
+        </div>
+        {% if not n.is_read %}
+          <form method="post" action="{% url 'notification_mark_read' n.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}">
+            <button class="btn btn-sm btn-outline-primary" type="submit">Mark read</button>
+          </form>
+        {% endif %}
+      </div>
+    {% empty %}
+      <div class="list-group-item text-muted">No notifications yet.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

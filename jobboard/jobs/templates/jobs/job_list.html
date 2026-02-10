@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+{% block title %}Jobs • JobBoard{% endblock %}
+{% block content %}
+
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+  <div>
+    <h1 class="h4 mb-1">Find your next job</h1>
+    <div class="text-muted">Indeed-style search with smart filters.</div>
+  </div>
+  <div class="d-flex gap-2">
+    {% if user.is_authenticated and user.role == 'employer' %}
+      <a class="btn btn-primary" href="{% url 'create_job' %}">Post a job</a>
+    {% endif %}
+    <a class="btn btn-outline-secondary" href="{% url 'job_list' %}">Browse all</a>
+  </div>
+</div>
+
+<div class="card p-3 mb-3">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-lg-4 col-md-6">
+      <label class="form-label">Keyword</label>
+      <input class="form-control" name="q" value="{{ q }}" placeholder="Job title or keyword">
+    </div>
+    <div class="col-lg-3 col-md-6">
+      <label class="form-label">Company</label>
+      <input class="form-control" name="company" value="{{ company }}" placeholder="Company name">
+    </div>
+    <div class="col-lg-2 col-md-6">
+      <label class="form-label">City</label>
+      <input class="form-control" name="city" list="city_list" value="{{ city }}" placeholder="All cities">
+      <datalist id="city_list">
+        {% for c in cities %}
+          <option value="{{ c }}"></option>
+        {% endfor %}
+      </datalist>
+    </div>
+    <div class="col-lg-3 col-md-6">
+      <label class="form-label">Skills</label>
+      <input id="search-skills-input" class="form-control" name="skills" value="{{ skills }}" placeholder="Python, Django, SQL">
+      <div id="search-skills-suggestions" class="mt-2 d-flex flex-wrap gap-1">
+        {% for s in skill_suggestions %}
+          <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2 js-skill-suggestion" data-skill="{{ s }}">{{ s }}</button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="col-lg-2 col-md-4">
+      <label class="form-label">Min salary</label>
+      <input class="form-control" name="min_salary" value="{{ min_salary }}" type="number" min="0" placeholder="50000">
+    </div>
+    <div class="col-lg-2 col-md-4">
+      <label class="form-label">Max salary</label>
+      <input class="form-control" name="max_salary" value="{{ max_salary }}" type="number" min="0" placeholder="120000">
+    </div>
+    <div class="col-lg-2 col-md-4">
+      <label class="form-label">Job type</label>
+      <select class="form-select" name="job_type">
+        <option value="">All types</option>
+        {% for value,label in job_type_choices %}
+          <option value="{{ value }}" {% if job_type == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-lg-2 col-md-4">
+      <label class="form-label">Experience</label>
+      <select class="form-select" name="experience_level">
+        <option value="">All levels</option>
+        {% for value,label in experience_choices %}
+          <option value="{{ value }}" {% if experience_level == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-lg-2 col-md-4">
+      <label class="form-label">Cover letter</label>
+      <select class="form-select" name="cover_letter">
+        <option value="any" {% if cover_letter == "any" %}selected{% endif %}>Any</option>
+        <option value="required" {% if cover_letter == "required" %}selected{% endif %}>Required</option>
+        <option value="not_required" {% if cover_letter == "not_required" %}selected{% endif %}>Not required</option>
+      </select>
+    </div>
+    <div class="col-lg-2 col-md-4">
+      <label class="form-label">Sort</label>
+      <select class="form-select" name="sort">
+        <option value="newest" {% if sort == "newest" %}selected{% endif %}>Newest</option>
+        <option value="salary_high" {% if sort == "salary_high" %}selected{% endif %}>Highest salary</option>
+        <option value="salary_low" {% if sort == "salary_low" %}selected{% endif %}>Lowest salary</option>
+      </select>
+    </div>
+    <div class="col-lg-2 col-md-4 d-grid">
+      <button class="btn btn-dark" type="submit">Search</button>
+    </div>
+    <div class="col-12">
+      <a class="small" href="{% url 'job_list' %}">Clear filters</a>
+    </div>
+  </form>
+</div>
+
+{% if jobs %}
+  <div class="vstack gap-3">
+    {% for job in jobs %}
+      <div class="card job-card">
+        <div class="card-body">
+          <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+            <div class="flex-grow-1">
+              <h2 class="h5 mb-1">
+                <a class="text-decoration-none" href="{% url 'job_detail' job.id %}">{{ job.title }}</a>
+              </h2>
+              <div class="text-muted mb-2">
+                {{ job.employer.company_name }} • {{ job.location }}
+              </div>
+              <div class="d-flex flex-wrap gap-1 mb-2">
+                <span class="badge bg-light text-dark border">{{ job.get_job_type_display }}</span>
+                <span class="badge bg-light text-dark border">{{ job.get_experience_level_display }}</span>
+                {% if job.cover_letter_required %}
+                  <span class="badge bg-primary">Cover letter required</span>
+                {% endif %}
+                {% if job.min_salary or job.max_salary %}
+                  <span class="badge bg-light text-dark border">
+                    $ {% if job.min_salary %}{{ job.min_salary }}{% else %}?{% endif %} - {% if job.max_salary %}{{ job.max_salary }}{% else %}?{% endif %} USD
+                  </span>
+                {% endif %}
+              </div>
+              <p class="mb-2 text-muted">{{ job.description|truncatechars:220 }}</p>
+              {% if job.required_skills %}
+                <div class="d-flex flex-wrap gap-1">
+                  {% for s in job.skills_list %}
+                    <span class="badge bg-secondary">{{ s }}</span>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="d-flex flex-column gap-2 align-items-stretch" style="min-width: 160px;">
+              <a class="btn btn-outline-secondary btn-sm" href="{% url 'job_detail' job.id %}">Details</a>
+              {% if user.is_authenticated and user.role == 'jobseeker' %}
+                <a class="btn btn-primary btn-sm" href="{% url 'apply_job' job.id %}">Apply</a>
+                <a
+                  class="btn btn-sm {% if job.id in saved_job_ids %}btn-success{% else %}btn-outline-secondary{% endif %}"
+                  href="{% url 'toggle_saved_job' job.id %}?next={{ request.get_full_path|urlencode }}"
+                >{% if job.id in saved_job_ids %}Saved{% else %}Save{% endif %}</a>
+              {% else %}
+                {% url 'apply_job' job.id as apply_url %}
+                <a class="btn btn-primary btn-sm" href="{% url 'login' %}?next={{ apply_url|urlencode }}">Apply</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="card p-4">
+    <p class="mb-0">No jobs match your filters.</p>
+  </div>
+{% endif %}
+
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+  <nav class="mt-4">
+    <ul class="pagination justify-content-center flex-wrap">
+      {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="?{% if q %}q={{ q|urlencode }}&{% endif %}{% if company %}company={{ company|urlencode }}&{% endif %}{% if min_salary %}min_salary={{ min_salary }}&{% endif %}{% if max_salary %}max_salary={{ max_salary }}&{% endif %}{% if skills %}skills={{ skills|urlencode }}&{% endif %}{% if city %}city={{ city|urlencode }}&{% endif %}{% if job_type %}job_type={{ job_type|urlencode }}&{% endif %}{% if experience_level %}experience_level={{ experience_level|urlencode }}&{% endif %}{% if cover_letter %}cover_letter={{ cover_letter|urlencode }}&{% endif %}{% if sort %}sort={{ sort|urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">Prev</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Prev</span></li>
+      {% endif %}
+      <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+      {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="?{% if q %}q={{ q|urlencode }}&{% endif %}{% if company %}company={{ company|urlencode }}&{% endif %}{% if min_salary %}min_salary={{ min_salary }}&{% endif %}{% if max_salary %}max_salary={{ max_salary }}&{% endif %}{% if skills %}skills={{ skills|urlencode }}&{% endif %}{% if city %}city={{ city|urlencode }}&{% endif %}{% if job_type %}job_type={{ job_type|urlencode }}&{% endif %}{% if experience_level %}experience_level={{ experience_level|urlencode }}&{% endif %}{% if cover_letter %}cover_letter={{ cover_letter|urlencode }}&{% endif %}{% if sort %}sort={{ sort|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Next</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
+
+<script>
+  (function () {
+    const input = document.getElementById("search-skills-input");
+    const box = document.getElementById("search-skills-suggestions");
+    if (!input || !box) return;
+
+    function currentFragment() {
+      const parts = (input.value || "").split(",");
+      return (parts[parts.length - 1] || "").trim();
+    }
+
+    function addSkill(skill) {
+      const parts = (input.value || "").split(",").map((p) => p.trim()).filter(Boolean);
+      const idx = parts.findIndex((p) => p.toLowerCase() === skill.toLowerCase());
+      if (idx === -1) parts.push(skill);
+      input.value = parts.join(", ");
+      input.focus();
+    }
+
+    function render(items) {
+      box.innerHTML = "";
+      items.forEach((item) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn btn-outline-secondary btn-sm py-0 px-2";
+        btn.textContent = item;
+        btn.addEventListener("click", () => addSkill(item));
+        box.appendChild(btn);
+      });
+    }
+
+    async function refreshFromServer() {
+      const q = currentFragment();
+      try {
+        const res = await fetch("{% url 'skill_suggestions_api' %}?q=" + encodeURIComponent(q));
+        if (!res.ok) return;
+        const data = await res.json();
+        if (Array.isArray(data.items)) render(data.items);
+      } catch (err) {}
+    }
+
+    box.querySelectorAll(".js-skill-suggestion").forEach((btn) => {
+      btn.addEventListener("click", () => addSkill(btn.dataset.skill || btn.textContent || ""));
+    });
+    input.addEventListener("input", refreshFromServer);
+  })();
+</script>
+{% endblock %}

@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}Job seeker dashboard • JobBoard{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h1 class="h4 mb-1">My dashboard</h1>
+    <div class="text-muted">Track your job search.</div>
+  </div>
+  <a class="btn btn-outline-primary" href="{% url 'job_list' %}">Browse jobs</a>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-3">
+    <div class="card p-3">
+      <div class="text-muted small">Applications</div>
+      <div class="display-6 mb-0">{{ apps_count }}</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3">
+      <div class="text-muted small">Saved jobs</div>
+      <div class="display-6 mb-0">{{ saved_count }}</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3">
+      <div class="text-muted small">Alerts (unseen)</div>
+      <div class="display-6 mb-0">{{ alerts_unseen }}</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3">
+      <div class="text-muted small">Pipeline</div>
+      <div class="mt-2 d-flex flex-wrap gap-2">
+        <span class="badge bg-primary">Submitted {{ submitted_count }}</span>
+        <span class="badge bg-warning text-dark">Interview {{ interview_count }}</span>
+        <span class="badge bg-danger">Rejected {{ rejected_count }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="card p-3">
+      <div class="fw-semibold mb-2">My applications chart</div>
+      <canvas id="appsChart" height="220"></canvas>
+      <div id="appsChartFallback" class="small text-muted mt-2 d-none"></div>
+      <div class="mt-2 d-flex gap-2">
+        <a class="btn btn-outline-secondary btn-sm" href="{% url 'my_applications' %}">All applications</a>
+        <a class="btn btn-outline-secondary btn-sm" href="{% url 'recommended_jobs' %}">Recommended</a>
+        <a class="btn btn-outline-secondary btn-sm" href="{% url 'job_alerts' %}">Job alerts</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="card p-3">
+      <div class="fw-semibold mb-2">Recent applications</div>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Job</th>
+              <th>Company</th>
+              <th>Status</th>
+              <th>Submitted</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in recent_apps %}
+              <tr>
+                <td class="fw-semibold">{{ a.job.title }}</td>
+                <td class="text-muted">{{ a.job.employer.company_name }}</td>
+                <td><span class="badge bg-light text-dark border text-uppercase">{{ a.status }}</span></td>
+                <td class="text-muted small">{{ a.submitted_at|date:"Y-m-d" }}</td>
+                <td><a class="btn btn-outline-secondary btn-sm" href="{% url 'application_detail' a.id %}">Open</a></td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="5" class="text-muted">No applications yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  (function () {
+    const chartCanvas = document.getElementById("appsChart");
+    const fallback = document.getElementById("appsChartFallback");
+    const labels = ["Submitted", "Interview", "Rejected"];
+    const values = [{{ submitted_count|default:0 }}, {{ interview_count|default:0 }}, {{ rejected_count|default:0 }}];
+    const total = values.reduce((a, b) => a + b, 0);
+
+    if (chartCanvas && window.Chart) {
+      new Chart(chartCanvas.getContext("2d"), {
+        type: "doughnut",
+        data: {
+          labels: labels,
+          datasets: [{
+            data: values,
+            backgroundColor: ["#0d6efd", "#ffc107", "#dc3545"]
+          }]
+        },
+        options: { plugins: { legend: { position: "bottom" } } }
+      });
+      return;
+    }
+
+    if (!fallback) return;
+    fallback.classList.remove("d-none");
+    if (total === 0) {
+      fallback.textContent = "No application data yet.";
+      return;
+    }
+    fallback.innerHTML = labels.map((label, idx) => {
+      const value = values[idx] || 0;
+      const pct = Math.round((value / total) * 100);
+      return `<div>${label}: ${value} (${pct}%)</div>`;
+    }).join("");
+  })();
+</script>
+{% endblock %}

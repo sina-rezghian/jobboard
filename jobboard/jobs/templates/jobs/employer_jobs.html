@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}My Jobs • JobBoard
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+  <nav class="mt-3">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Prev</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Prev</span></li>
+      {% endif %}
+      <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+      {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Next</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
+
+{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h1 class="h4 mb-1">My Jobs</h1>
+    <div class="text-muted">Manage your job postings.</div>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-dark" href="{% url 'employer_applications' %}">All applications</a>
+    <a class="btn btn-primary" href="{% url 'create_job' %}">Post a Job</a>
+  </div>
+</div>
+
+{% if jobs %}
+  <div class="card p-3">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Location</th>
+            <th>Salary</th>
+            <th>Posted</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for job in jobs %}
+            <tr>
+              <td>
+                <a class="text-decoration-none" href="{% url 'job_detail' job.id %}"><strong>{{ job.title }}</strong></a>
+                {% if job.required_skills %}
+                  <div class="small text-muted mt-1">
+                    Skills: {{ job.required_skills|truncatechars:60 }}
+                  </div>
+                {% endif %}
+              </td>
+              <td class="text-muted">{{ job.location }}</td>
+              <td class="text-muted">
+                {% if job.min_salary or job.max_salary %}
+                  {% if job.min_salary %}{{ job.min_salary }}{% else %}?{% endif %}
+                  -
+                  {% if job.max_salary %}{{ job.max_salary }}{% else %}?{% endif %}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td class="text-muted">{{ job.created_at|date:"Y-m-d" }}</td>
+              <td class="text-end">
+                <a class="btn btn-outline-primary btn-sm" href="{% url 'edit_job' job.id %}">Edit</a>
+                <a class="btn btn-outline-secondary btn-sm" href="{% url 'view_applications' job.id %}">Applications</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% else %}
+  <div class="card p-4">
+    <p class="mb-0">You have no job postings yet. <a href="{% url 'create_job' %}">Create one</a>.</p>
+  </div>
+{% endif %}
+
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+  <nav class="mt-3">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Prev</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Prev</span></li>
+      {% endif %}
+      <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+      {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Next</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
+
+{% endblock %}

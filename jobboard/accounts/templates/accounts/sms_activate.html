@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}SMS Activation • JobBoard{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card p-4">
+      <h1 class="h5 mb-2">Activate via SMS (Demo)</h1>
+      <p class="text-muted">
+        Enter your username, tap <strong>Send code</strong>, then copy the code from terminal output or
+        <code>logs/sms_demo.log</code>.
+      </p>
+
+      <form method="post" id="smsActivateForm" novalidate>
+        {% csrf_token %}
+        <div id="smsSendStatus" class="alert d-none py-2" role="alert"></div>
+        <div class="mb-3">
+          <label class="form-label">Username</label>
+          <input class="form-control" id="smsUsername" name="username" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Code</label>
+          <input class="form-control" name="code" required>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <button class="btn btn-outline-primary" id="smsSendCodeBtn" type="button" data-send-url="{% url 'sms_send_code' %}">
+            Send code
+          </button>
+          <button class="btn btn-primary" type="submit">Activate</button>
+          <a class="btn btn-outline-secondary" href="{% url 'login' %}">Back to login</a>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const form = document.getElementById("smsActivateForm");
+    const usernameInput = document.getElementById("smsUsername");
+    const sendBtn = document.getElementById("smsSendCodeBtn");
+    const statusEl = document.getElementById("smsSendStatus");
+    if (!form || !usernameInput || !sendBtn || !statusEl) return;
+
+    const csrfInput = form.querySelector("input[name=csrfmiddlewaretoken]");
+    const sendUrl = sendBtn.getAttribute("data-send-url");
+    const idleLabel = "Send code";
+    const pendingLabel = "Pending...";
+
+    function showStatus(message, isSuccess) {
+      statusEl.textContent = message;
+      statusEl.classList.remove("d-none", "alert-success", "alert-danger");
+      statusEl.classList.add(isSuccess ? "alert-success" : "alert-danger");
+    }
+
+    sendBtn.addEventListener("click", async function () {
+      const username = (usernameInput.value || "").trim();
+      if (!username) {
+        showStatus("Please enter your username first.", false);
+        usernameInput.focus();
+        return;
+      }
+
+      sendBtn.disabled = true;
+      sendBtn.textContent = pendingLabel;
+      statusEl.classList.add("d-none");
+
+      try {
+        const body = new URLSearchParams();
+        body.set("username", username);
+        const response = await fetch(sendUrl, {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": csrfInput ? csrfInput.value : "",
+            "X-Requested-With": "XMLHttpRequest",
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+          },
+          body: body.toString()
+        });
+        const data = await response.json();
+        showStatus(data.message || "Request completed.", response.ok && data.ok);
+      } catch (err) {
+        showStatus("Could not send code. Try again.", false);
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.textContent = idleLabel;
+      }
+    });
+  })();
+</script>
+{% endblock %}

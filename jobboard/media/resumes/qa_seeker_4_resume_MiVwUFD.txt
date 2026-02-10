@@ -1,0 +1,3 @@
+Resume for Demo Seeker 4
+Education: Information Systems
+Skills: django, linux, node.js, react, rest

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}SMS Log{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h3 class="mb-1">SMS Log</h3>
+    <div class="text-muted small">Only shows demo SMS messages triggered from your job postings.</div>
+  </div>
+  <div class="btn-group">
+    <a class="btn btn-outline-secondary btn-sm {% if not kind %}active{% endif %}" href="{% url 'employer_sms_log' %}">All</a>
+    <a class="btn btn-outline-secondary btn-sm {% if kind == 'interview' %}active{% endif %}" href="{% url 'employer_sms_log' %}?kind=interview">Interview</a>
+    <a class="btn btn-outline-secondary btn-sm {% if kind == 'rejected' %}active{% endif %}" href="{% url 'employer_sms_log' %}?kind=rejected">Rejected</a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    {% if entries %}
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Kind</th>
+              <th>Job</th>
+              <th>Applicant</th>
+              <th>Phone</th>
+              <th>Message</th>
+              <th class="text-end">Application</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for e in entries %}
+              {% with m=e.meta %}
+              <tr>
+                <td class="text-muted small">{{ e.ts }}</td>
+                <td>
+                  {% if m.kind == 'interview' %}
+                    <span class="badge bg-success">Interview</span>
+                  {% elif m.kind == 'rejected' %}
+                    <span class="badge bg-danger">Rejected</span>
+                  {% else %}
+                    <span class="badge bg-secondary">{{ m.kind|default:e.tag }}</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="fw-semibold">{{ m.job_title|default:"-" }}</div>
+                  <div class="text-muted small">Job ID: {{ m.job_id|default:"-" }}</div>
+                </td>
+                <td>
+                  <div class="fw-semibold">{{ m.jobseeker_username|default:"-" }}</div>
+                  <div class="text-muted small">User ID: {{ m.jobseeker_user_id|default:"-" }}</div>
+                </td>
+                <td class="text-muted small">{{ e.phone }}</td>
+                <td style="max-width: 420px;">
+                  <div class="small">{{ e.message }}</div>
+                </td>
+                <td class="text-end">
+                  {% if m.application_id %}
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'application_detail' m.application_id %}">Details</a>
+                  {% else %}
+                    <span class="text-muted small">-</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endwith %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="text-muted">No SMS messages yet. When you schedule an interview or reject an application, the demo SMS will be logged here.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

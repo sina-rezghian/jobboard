@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Saved Jobs • JobBoard{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h1 class="h4 mb-1">Saved Jobs</h1>
+    <div class="text-muted">Your bookmarked job postings.</div>
+  </div>
+</div>
+
+{% if saved_jobs %}
+  <div class="vstack gap-3">
+    {% for item in saved_jobs %}
+      {% with job=item.job %}
+      <div class="card p-3">
+        <div class="d-flex justify-content-between align-items-start gap-3">
+          <div>
+            <div class="fw-semibold">{{ job.title }}</div>
+            <div class="text-muted small">{{ job.location }} • {{ job.employer.company_name }}</div>
+            {% if job.min_salary or job.max_salary %}
+              <div class="small mt-1">
+                <span class="badge bg-success-subtle text-success border">Salary</span>
+                {{ job.min_salary|default:"?" }} - {{ job.max_salary|default:"?" }}
+              </div>
+            {% endif %}
+          </div>
+          <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary btn-sm" href="{% url 'job_detail' job.id %}">View</a>
+            <a class="btn btn-outline-danger btn-sm" href="{% url 'toggle_saved_job' job.id %}?next={% url 'saved_jobs' %}">Remove</a>
+          </div>
+        </div>
+      </div>
+      {% endwith %}
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="card p-4">
+    <p class="mb-0">You have not saved any jobs yet.</p>
+  </div>
+{% endif %}
+
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+  <nav class="mt-3">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Prev</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Prev</span></li>
+      {% endif %}
+      <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+      {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Next</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
+{% endblock %}
